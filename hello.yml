@@ -1,6 +1,7 @@
 ---
   - name: Hello from Ansible Tower
     hosts: all
+    gather_facts: false
     tasks:
       - name: just display the message to check the playbook 
         debug:
