@@ -1,0 +1,10 @@
+---
+  - name: Hello from Ansible Tower
+    hosts: all
+    tasks:
+      - name: just display the message to check the playbook 
+        debug:
+          msg: Hello from Ansible-Tower
+
+          
+      
