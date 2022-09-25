@@ -1,0 +1,42 @@
+# Created by Rajkumar Sharma
+# To get crash_report info. 
+#
+---
+  - name: info after crash VMs 
+    hosts: all
+    tasks:
+    
+       - name: copy excel temp file to get output in that. . 
+         file:
+           dest: /tmp/crash_report.csv
+           state: touch
+         delegate_to: localhost
+
+       - name: get uptime variable 
+         shell: uptime | awk '{print $1,$2}'  
+         register: up_time 
+      
+       - name: NFS entry status fstab
+         shell: cat /etc/fstab | grep nfs | awk '{print $2}' | tr '\n' ":" 
+         register: nfs_s
+         ignore_errors: yes
+
+       - name: NFS mounted or not
+         shell: cat /proc/mounts | grep nfs | grep -v sunrpc | grep -v nfsd | awk '{printf "%s ", $2}' | tr '\n' "|"
+         register: nfs_mounted
+         ignore_errors: yes
+
+       - name: get OS Version
+         shell: cat /etc/redhat-release
+         register: os_version
+
+       - name: get ITM agent info
+         shell: sudo /opt/IBM/ITM/bin/cinfo -r | grep -Ei "\s+08|lz\s+" | awk '{print $2$7}' | tr '\n' "|"
+         register: itm_info
+
+       - name: collect info after patching
+         lineinfile:
+           path: /tmp/crash_report.csv
+           line: "{{ ansible_hostname }}, {{ os_version.stdout }}, {{ up_time.stdout }}, {{ nfs_s.stdout }}, {{ nfs_mounted.stdout }}, {{ itm_info.stdout }} "
+           insertafter: EOF
+         delegate_to: localhost
