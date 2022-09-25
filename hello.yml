@@ -1,7 +1,8 @@
 ---
   - name: Hello from Ansible Tower
     hosts: all
-    gather_facts: false
+    remote_user: osadmin
+    become: true
     tasks:
       - name: just display the message to check the playbook 
         debug:
